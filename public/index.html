@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Auxiliar de Estudos Bíblicos</title>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -14,10 +15,17 @@
     <form id="question-form">
       <label for="question">Digite sua pergunta sobre a Bíblia:</label>
       <textarea id="question" name="question" rows="4" required></textarea>
-      <button type="submit">Perguntar</button>
+      <div class="button-group">
+        <button type="button" onclick="askQuestion('padrao')">Explicação Padrão</button>
+        <button type="button" class="estudo" onclick="askQuestion('estudo')">Estudo Aprofundado</button>
+      </div>
     </form>
     <div id="response"></div>
+    <div class="container-button">
+      <button id="copyButton" class="hidden" onclick="copyToClipboard()">Copiar Resposta</button>
+    </div>
   </div>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script src="script.js"></script>
 </body>
 

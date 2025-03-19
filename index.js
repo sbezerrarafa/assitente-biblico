@@ -28,16 +28,34 @@ app.get('/', (req, res) => {
 
 // Rota para processar perguntas
 app.post('/ask', async (req, res) => {
-  const question = req.body.question;
+  const { question, mode } = req.body;
 
   if (!question || question.trim() === '') {
     return res.json({ success: false, message: 'Por favor, insira uma pergunta válida.' });
   }
 
   try {
+    let systemInstruction = '';
+
+    if (mode === 'padrao') {
+      systemInstruction = `Você é um assistente cristão protestante de linha arminiana, especialista em estudos bíblicos.
+      Responda às perguntas com base na Bíblia e forneça referências bíblicas sempre que possível.
+      Estruture a resposta da seguinte forma:
+      - **Versículos principais:** Apresente versículos que fundamentam o tema.
+      - **Explicação:** Explique o significado dos versículos de forma simples e direta.
+      - **Aplicação prática:** Dê sugestões de como o leitor pode aplicar esse ensinamento no dia a dia.`;
+    } else if (mode === 'estudo') {
+      systemInstruction = `Você é um assistente cristão especializado em teologia bíblica avançada. 
+      Responda de forma aprofundada, buscando referências ao texto original da Bíblia em hebraico e grego, contexto histórico, exegese e interpretação teológica. 
+      Sempre forneça as palavras originais e seus significados.
+      - **Versículos principais:** Apresente versículos que fundamentam o tema.
+      - **Explicação:** Explique o significado dos versículos de forma simples e direta.
+      - **Aplicação prática:** Dê sugestões de como o leitor pode aplicar esse ensinamento no dia a dia.`;
+    }
+
     const model = genAI.getGenerativeModel({
       model: 'gemini-1.5-flash',
-      systemInstruction: `Você é um assistente cristão protestante de linha arminiana, especialista em estudos bíblicos. Baseie suas respostas na Bíblia e forneça referências bíblicas sempre que possível.`,
+      systemInstruction,
     });
 
     const chat = model.startChat({
