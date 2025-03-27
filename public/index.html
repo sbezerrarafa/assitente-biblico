@@ -10,12 +10,18 @@
   <meta property="og:description" content="Faça perguntas sobre a Bíblia e receba explicações e estudos aprofundados!">
   <meta property="og:image" content="https://assitente-biblico.vercel.app/favicon-biblico.png">
   <meta property="og:site_name" content="Auxiliar de Estudos Bíblicos">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4CAF50">
 
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+  <div id="splash-screen" class="splash">
+    <img src="favicon-512x512.png" alt="Logo" />
+    <p>Carregando Auxiliar de Estudos Bíblicos...</p>
+  </div>
   <div class="container">
     <div class="topo">
       <img src="./favicon-biblico.png" alt="logo">
@@ -36,6 +42,13 @@
   </div>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script src="script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('✅ Service Worker registrado com sucesso!'))
+        .catch(err => console.error('❌ Erro ao registrar o Service Worker:', err));
+    }
+  </script>
 </body>
 
 </html>

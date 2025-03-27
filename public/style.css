@@ -76,3 +76,30 @@ button:hover {
 .estudo:hover {
   background-color: #344e86;
 }
+.splash {
+  position: fixed;
+  inset: 0;
+  background: #37465a;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  font-size: 1.2rem;
+  animation: fadeOut 0.4s ease-out 2s forwards;
+}
+
+.splash img {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 20px;
+  border-radius: 50%;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
