@@ -7,24 +7,28 @@ const app = express();
 const port = 3000;
 
 // 🔑 Verifica se a chave da API está carregando
-console.log("🔑 Chave da API:", process.env.GEMINI_API_KEY);
+const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) {
+  console.error("❌ Chave da API Gemini não encontrada. Verifique seu arquivo .env.");
+}
+console.log("🔑 Chave da API:", apiKey);
 
 // Inicializa o cliente da API
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI(apiKey);
 
 // Configuração de geração
 const generationConfig = {
   temperature: 0.7,
   topP: 0.9,
   topK: 40,
-  maxOutputTokens: 1024,
-  responseMimeType: 'text/plain',
+  maxOutputTokens: 2048,
+  // responseMimeType: 'text/plain',
 };
 
 // Middleware para servir arquivos estáticos e processar JSON
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json()); // ✅ Necessário para processar JSON corretamente
+app.use(bodyParser.json());
 
 // Rota principal
 app.get('/', (req, res) => {
@@ -48,19 +52,15 @@ app.post('/ask', async (req, res) => {
     let systemInstruction = '';
 
     if (mode === 'padrao') {
-      systemInstruction = `Você é um assistente cristão protestante de linha arminiana, especialista em estudos bíblicos.
-      Responda às perguntas com base na Bíblia e forneça referências bíblicas sempre que possível.
-      Estruture a resposta da seguinte forma:
-      - **Versículos principais:** Apresente versículos que fundamentam o tema.
-      - **Explicação:** Explique o significado dos versículos de forma simples e direta.
-      - **Aplicação prática:** Dê sugestões de como o leitor pode aplicar esse ensinamento no dia a dia.`;
+      systemInstruction = `Você é um assistente cristão protestante de linha arminiana, especialista em estudos bíblicos. Responda às perguntas com base na Bíblia e forneça referências bíblicas sempre que possível. Estruture a resposta da seguinte forma:
+- **Versículos principais:** Apresente versículos que fundamentam o tema.
+- **Explicação:** Explique o significado dos versículos de forma simples e direta.
+- **Aplicação prática:** Dê sugestões de como o leitor pode aplicar esse ensinamento no dia a dia.`;
     } else if (mode === 'estudo') {
-      systemInstruction = `Você é um assistente cristão especializado em teologia bíblica avançada. 
-      Responda de forma aprofundada, buscando referências ao texto original da Bíblia em hebraico e grego, contexto histórico, exegese e interpretação teológica. 
-      Sempre forneça as palavras originais e seus significados.
-      - **Versículos principais:** Apresente versículos que fundamentam o tema.
-      - **Explicação:** Explique o significado dos versículos de forma simples e direta.
-      - **Aplicação prática:** Dê sugestões de como o leitor pode aplicar esse ensinamento no dia a dia.`;
+      systemInstruction = `Você é um assistente cristão especializado em teologia bíblica avançada. Responda de forma aprofundada, buscando referências ao texto original da Bíblia em hebraico e grego, contexto histórico, exegese e interpretação teológica. Sempre forneça as palavras originais e seus significados. Estruture a resposta da seguinte forma:
+- **Versículos principais:** Apresente versículos que fundamentam o tema.
+- **Explicação:** Explique o significado dos versículos de forma simples e direta.
+- **Aplicação prática:** Dê sugestões de como o leitor pode aplicar esse ensinamento no dia a dia.`;
     }
 
     console.log("📜 Instrução do sistema:", systemInstruction);
@@ -70,24 +70,19 @@ app.post('/ask', async (req, res) => {
       systemInstruction,
     });
 
-    console.log("🤖 Modelo Gemini criado:", model);
+    console.log("🤖 Modelo Gemini inicializado.");
 
-    const chat = model.startChat({
-      generationConfig: generationConfig,
-      history: [],
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: question }] }],
+      generationConfig,
     });
 
-    console.log("💬 Chat iniciado com configuração:", generationConfig);
-    console.log("📨 Enviando pergunta:", question);
+    console.log("📦 Resposta bruta recebida:", result);
 
-    const result = await chat.sendMessage(question);
-    console.log("📦 Resultado bruto da Gemini:", result);
+    const responseText = result.response.text();
+    console.log("📝 Texto gerado pela Gemini:", responseText);
 
-    // 🔍 Verifica se a resposta está estruturada corretamente
-    const response = await result.response.text(); // ou use o caminho alternativo se necessário
-    console.log("📝 Texto gerado pela Gemini:", response);
-
-    res.json({ success: true, answer: response });
+    res.json({ success: true, answer: responseText });
   } catch (error) {
     console.error("❌ Erro ao obter resposta:", error);
     res.json({ success: false, error: error.message || 'Erro ao gerar resposta. Tente novamente mais tarde.' });
