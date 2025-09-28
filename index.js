@@ -19,6 +19,7 @@ const generationConfig = {
 
 // Middleware para servir arquivos estáticos e processar formulários
 app.use(express.static('public'));
+app.use(express.json()); // <--- ADICIONE ESTA LINHA
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Rota para servir a página principal
