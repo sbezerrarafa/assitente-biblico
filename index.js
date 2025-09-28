@@ -6,9 +6,13 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const app = express();
 const port = 3000;
 
+// 🔑 Verifica se a chave da API está carregando
+console.log("🔑 Chave da API:", process.env.GEMINI_API_KEY);
+
 // Inicializa o cliente da API
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// Configuração de geração
 const generationConfig = {
   temperature: 0.7,
   topP: 0.9,
@@ -17,25 +21,30 @@ const generationConfig = {
   responseMimeType: 'text/plain',
 };
 
-// Middleware para servir arquivos estáticos e processar formulários
+// Middleware para servir arquivos estáticos e processar JSON
 app.use(express.static('public'));
-app.use(express.json()); // <--- ADICIONE ESTA LINHA
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json()); // ✅ Necessário para processar JSON corretamente
 
-// Rota para servir a página principal
+// Rota principal
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
 
-// Rota para processar perguntas
+// Rota de perguntas
 app.post('/ask', async (req, res) => {
+  console.log("📥 Requisição recebida:", req.body);
+
   const { question, mode } = req.body;
 
   if (!question || question.trim() === '') {
-    return res.json({ success: false, message: 'Por favor, insira uma pergunta válida.' });
+    console.warn("⚠️ Pergunta inválida.");
+    return res.json({ success: false, error: 'Por favor, insira uma pergunta válida.' });
   }
 
   try {
+    console.log("🟡 Modo selecionado:", mode);
+
     let systemInstruction = '';
 
     if (mode === 'padrao') {
@@ -54,27 +63,38 @@ app.post('/ask', async (req, res) => {
       - **Aplicação prática:** Dê sugestões de como o leitor pode aplicar esse ensinamento no dia a dia.`;
     }
 
+    console.log("📜 Instrução do sistema:", systemInstruction);
+
     const model = genAI.getGenerativeModel({
       model: 'gemini-2.5-flash',
       systemInstruction,
     });
+
+    console.log("🤖 Modelo Gemini criado:", model);
 
     const chat = model.startChat({
       generationConfig: generationConfig,
       history: [],
     });
 
+    console.log("💬 Chat iniciado com configuração:", generationConfig);
+    console.log("📨 Enviando pergunta:", question);
+
     const result = await chat.sendMessage(question);
-    const response = await result.response.text();
+    console.log("📦 Resultado bruto da Gemini:", result);
+
+    // 🔍 Verifica se a resposta está estruturada corretamente
+    const response = await result.response.text(); // ou use o caminho alternativo se necessário
+    console.log("📝 Texto gerado pela Gemini:", response);
 
     res.json({ success: true, answer: response });
   } catch (error) {
-    console.error('Erro ao obter resposta:', error);
-    res.json({ success: false, message: 'Erro ao gerar resposta. Tente novamente mais tarde.' });
+    console.error("❌ Erro ao obter resposta:", error);
+    res.json({ success: false, error: error.message || 'Erro ao gerar resposta. Tente novamente mais tarde.' });
   }
 });
 
 // Inicia o servidor
 app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:${port}`);
+  console.log(`🚀 Servidor rodando em http://localhost:${port}`);
 });
