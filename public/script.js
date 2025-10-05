@@ -1,7 +1,7 @@
 const form = document.getElementById('question-form');
 const responseDiv = document.getElementById('response');
 
-const API_URL = '/api/ask';
+const API_URL = '/ask';
 
 
 function askQuestion(mode) {
