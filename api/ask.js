@@ -8,7 +8,6 @@ const generationConfig = {
   topP: 0.9,
   topK: 40,
   maxOutputTokens: 1024,
-  responseMimeType: 'text/plain',
 };
 
 export default async function handler(req, res) {
