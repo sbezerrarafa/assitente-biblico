@@ -4,10 +4,6 @@
 
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-// Se estiver testando local com `vercel dev`, o .env é lido automaticamente.
-// Caso rode com node puro, descomente a linha abaixo:
-// require('dotenv').config();
-
 const API_KEY = process.env.GEMINI_API_KEY;
 const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash'; // ex.: 'gemini-2.0-flash' / 'gemini-2.5-flash'
 
@@ -18,7 +14,7 @@ const generationConfig = {
   temperature: 0.7,
   topP: 0.9,
   topK: 40,
-  maxOutputTokens: 2048,
+  maxOutputTokens: 1048,
 };
 
 module.exports = async (req, res) => {
