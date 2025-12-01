@@ -4,32 +4,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="favicon-biblico.png">
+  <link rel="icon" type="image/png" href="img/favicon-biblico.png">
   <title>Auxiliar de Estudos Bíblicos</title>
   <meta property="og:title" content="Auxiliar de Estudos Bíblicos 📖✨">
   <meta property="og:description" content="Faça perguntas sobre a Bíblia e receba explicações e estudos aprofundados!">
-  <meta property="og:image" content="https://assitente-biblico.vercel.app/favicon-biblico.png">
   <meta property="og:site_name" content="Auxiliar de Estudos Bíblicos">
-  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#37465A">
-
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
   <div id="splash-screen" class="splash">
-    <img src="favicon-512x512.png" alt="Logo" />
+    <img src="img/favicon-512x512.png" alt="Logo" />
     <p>Carregando Auxiliar de Estudos Bíblicos...</p>
   </div>
   <div class="container">
     <div class="topo">
-      <img src="./favicon-biblico.png" alt="logo">
+      <img src="./img/favicon-biblico.png" alt="logo">
       <h1>Auxiliar de Estudos Bíblicos</h1>
     </div>
     <form id="question-form">
       <label for="question">Digite sua pergunta sobre a Bíblia:</label>
-      <textarea id="question" name="question" rows="4" required></textarea>
+      <textarea id="question" name="question" rows="4" required placeholder="Ex: Quem escreveu o livro de Gênesis?"></textarea>
       <div class="button-group">
         <button type="button" onclick="askQuestion('padrao')">Explicação Padrão</button>
         <button type="button" class="estudo" onclick="askQuestion('estudo')">Estudo Aprofundado</button>
@@ -40,14 +37,13 @@
       <button id="copyButton" class="hidden" onclick="copyToClipboard()">Copiar Resposta</button>
     </div>
   </div>
+
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
   <script src="script.js"></script>
+
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('✅ Service Worker registrado com sucesso!'))
-        .catch(err => console.error('❌ Erro ao registrar o Service Worker:', err));
-    }
+
   </script>
 </body>
 
