@@ -1,6 +1,12 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config();
+const express = require('express');
+const bodyParser = require('body-parser');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
+const app = express();
+const port = 3000;
+
+// Inicializa o cliente da API
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const generationConfig = {
@@ -11,17 +17,21 @@ const generationConfig = {
   responseMimeType: 'text/plain',
 };
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
-    return;
-  }
+// Middleware para servir arquivos estáticos e processar formulários
+app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extended: true }));
 
+// Rota para servir a página principal
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
+});
+
+// Rota para processar perguntas
+app.post('/ask', async (req, res) => {
   const { question, mode } = req.body;
 
-  if (!question) {
-    res.status(400).json({ error: 'Missing question in request body' });
-    return;
+  if (!question || question.trim() === '') {
+    return res.json({ success: false, message: 'Por favor, insira uma pergunta válida.' });
   }
 
   try {
@@ -54,11 +64,16 @@ export default async function handler(req, res) {
     });
 
     const result = await chat.sendMessage(question);
-    const responseText = await result.response.text();
+    const response = await result.response.text();
 
-    res.status(200).json({ success: true, answer: responseText });
+    res.json({ success: true, answer: response });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, error: 'Erro ao gerar resposta' });
+    console.error('Erro ao obter resposta:', error);
+    res.json({ success: false, message: 'Erro ao gerar resposta. Tente novamente mais tarde.' });
   }
-}
+});
+
+// Inicia o servidor
+app.listen(port, () => {
+  console.log(`Servidor rodando em http://localhost:${port}`);
+});
